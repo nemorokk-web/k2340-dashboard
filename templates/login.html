@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>K2340 Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f111a; color: #e2e8f0; }
+        .card { background-color: #1a1d29; }
+        .input-field { background-color: #0f111a; border: 1px solid #2d3748; }
+        .input-field:focus { border-color: #6366f1; outline: none; }
+        .btn-primary { background-color: #6366f1; transition: 0.2s; }
+        .btn-primary:hover { background-color: #4f46e5; }
+    </style>
+</head>
+<body class="h-screen flex items-center justify-center">
+
+    <div class="card p-8 rounded-xl shadow-2xl w-96 border border-gray-800">
+        <h2 class="text-2xl font-bold text-center mb-6 text-indigo-400">K2340 Dashboard</h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="bg-red-500/20 text-red-400 p-3 rounded mb-4 text-sm text-center">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="mb-4">
+                <label class="block text-xs text-gray-400 mb-1">GOVERNOR ID</label>
+                <input type="text" name="gov_id" placeholder="12345678" class="input-field w-full p-2.5 rounded text-sm text-white">
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-xs text-gray-400 mb-1">PASSWORD</label>
+                <input type="password" name="password" placeholder="••••••••" class="input-field w-full p-2.5 rounded text-sm text-white">
+            </div>
+
+            <button type="submit" class="btn-primary w-full py-2.5 rounded font-bold text-white shadow-lg">
+                Login
+            </button>
+        </form>
+
+        <p class="mt-6 text-xs text-center text-gray-500">
+            First time? Type <span class="text-indigo-400 font-mono">!password</span> in Discord.
+        </p>
+    </div>
+
+</body>
+</html>
