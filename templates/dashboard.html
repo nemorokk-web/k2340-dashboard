@@ -2,253 +2,391 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>K2340 Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <style>
-        body { background-color: #0b0c15; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .sidebar { background-color: #12141f; width: 260px; border-right: 1px solid #1e293b; }
-        .card { background-color: #1a1d29; border: 1px solid #2d3748; transition: transform 0.2s; }
-        .card:hover { border-color: #6366f1; transform: translateY(-2px); }
-        .nav-item { transition: 0.2s; border-left: 3px solid transparent; }
-        .nav-item:hover { background-color: #1e293b; color: white; }
-        .nav-item.active { background-color: #1e293b; color: #6366f1; border-left-color: #6366f1; }
-        .stat-val { font-family: 'Roboto Mono', monospace; }
-        .table-row { border-bottom: 1px solid #1e293b; transition: 0.2s; }
-        .table-row:hover { background-color: #1e293b; }
+        :root {
+            --bg-body: #0f1014;
+            --bg-card: #1b1c21;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-color: #5865F2; 
+            --border-color: #2f3037;
+            --success: #2ecc71;
+            --danger: #ff4757; /* Brighter red */
+            --warning: #f1c40f;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            background-color: rgba(27, 28, 33, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--text-main) !important;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            margin-right: 15px;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            padding: 8px 16px !important;
+        }
+        .nav-link:hover {
+            color: var(--text-main) !important;
+            background-color: rgba(255,255,255,0.05);
+        }
+        .nav-link.active {
+            background-color: var(--accent-color);
+            color: white !important;
+        }
+
+        /* --- Cards --- */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            margin-bottom: 24px;
+        }
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+        .stat-card {
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-color);
+        }
+        /* FIX: Ensure values are always white/bright */
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-top: 15px;
+            color: #ffffff !important; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* --- Tables --- */
+        .table-responsive {
+            border-radius: 0 0 12px 12px;
+        }
+        .table {
+            color: var(--text-main);
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+        .table thead th {
+            background-color: #23242a;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            padding: 15px;
+        }
+        .table tbody td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: transparent;
+            color: #e0e0e0; /* Default text color in tables */
+        }
+        .table-hover tbody tr:hover td {
+            background-color: rgba(255,255,255,0.03);
+            color: white;
+        }
+        
+        /* --- Utilities --- */
+        .badge { padding: 6px 10px; border-radius: 6px; font-weight: 600; }
+        .text-success { color: var(--success) !important; }
+        .text-danger { color: var(--danger) !important; }
+        .text-warning { color: var(--warning) !important; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: #36393f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body>
 
-    <div class="sidebar flex flex-col p-6">
-        <div class="flex items-center gap-3 mb-10">
-            <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">K</div>
-            <div>
-                <h1 class="font-bold text-xl tracking-wide text-white">Kingdom 2340</h1>
-                <p class="text-xs text-gray-500">Smash Forts System</p>
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid px-5">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <i class="fas fa-shield-alt me-2" style="color: var(--accent-color);"></i>K2340
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto ms-4">
+                <li class="nav-item"><a class="nav-link {% if page == 'overview' %}active{% endif %}" href="{{ url_for('dashboard') }}"><i class="fas fa-home me-2"></i>Overview</a></li>
+                <li class="nav-item"><a class="nav-link {% if page == 'stats' %}active{% endif %}" href="{{ url_for('stats_page') }}"><i class="fas fa-user-astronaut me-2"></i>Profile</a></li>
+                <li class="nav-item"><a class="nav-link {% if page == 'credits' %}active{% endif %}" href="{{ url_for('credits_page') }}"><i class="fas fa-wallet me-2"></i>Wallet</a></li>
+                <li class="nav-item"><a class="nav-link {% if page == 'history' %}active{% endif %}" href="{{ url_for('history_page') }}"><i class="fas fa-history me-2"></i>Seasons</a></li>
+                <li class="nav-item"><a class="nav-link {% if page == 'kvk_history' %}active{% endif %}" href="{{ url_for('kvk_history_page') }}"><i class="fas fa-globe me-2"></i>KvK Record</a></li>
+                <li class="nav-item"><a class="nav-link {% if page == 'kingdom' %}active{% endif %}" href="{{ url_for('kingdom_page') }}"><i class="fas fa-crown me-2"></i>Kingdom</a></li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-3">
+                    <i class="fas fa-user-circle me-1"></i> {{ user }}
+                </span>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm" style="border-radius: 20px; padding: 5px 15px;">Logout</a>
             </div>
         </div>
+    </div>
+</nav>
 
-        <nav class="flex-1 space-y-2">
-            <a href="/dashboard" class="nav-item flex items-center gap-3 px-4 py-3 rounded-r-lg text-gray-400 {{ 'active' if page == 'overview' }}">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                <span class="text-sm font-medium">Overview</span>
-            </a>
-            <a href="/stats" class="nav-item flex items-center gap-3 px-4 py-3 rounded-r-lg text-gray-400 {{ 'active' if page == 'stats' }}">
-                <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
-                <span class="text-sm font-medium">My Stats</span>
-            </a>
-            <a href="/kvk_history" class="nav-item flex items-center gap-3 px-4 py-3 rounded-r-lg text-gray-400 {{ 'active' if page == 'kvk_history' }}">
-                <i data-lucide="swords" class="w-5 h-5"></i>
-                <span class="text-sm font-medium">KvK History</span>
-            </a>
-            <a href="/credits" class="nav-item flex items-center gap-3 px-4 py-3 rounded-r-lg text-gray-400 {{ 'active' if page == 'credits' }}">
-                <i data-lucide="credit-card" class="w-5 h-5"></i>
-                <span class="text-sm font-medium">Credits</span>
-            </a>
-            <a href="/history" class="nav-item flex items-center gap-3 px-4 py-3 rounded-r-lg text-gray-400 {{ 'active' if page == 'history' }}">
-                <i data-lucide="history" class="w-5 h-5"></i>
-                <span class="text-sm font-medium">Season History</span>
-            </a>
-        </nav>
+<div class="container-fluid px-5 py-4">
 
-        <div class="mt-auto pt-6 border-t border-gray-800">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-xs font-bold">You</div>
-                <div>
-                    <p class="text-sm font-bold text-white">Governor</p>
-                    <p class="text-xs text-gray-500">ID: {{ user }}</p>
-                </div>
-            </div>
-            <a href="/logout" class="flex items-center gap-2 text-red-400 hover:text-red-300 text-sm px-2">
-                <i data-lucide="log-out" class="w-4 h-4"></i> Logout
-            </a>
+    {% if page == 'overview' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="fw-bold">Welcome back, <span style="color: var(--accent-color);">{{ user }}</span></h3>
+            <p class="text-muted">System Status: <span class="badge bg-secondary">{{ data.overview.season }}</span></p>
         </div>
     </div>
 
-    <div class="flex-1 p-10 overflow-y-auto bg-[#0b0c15]">
-        
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h2 class="text-3xl font-bold text-white mb-1">
-                    {% if page == 'overview' %} Dashboard Overview
-                    {% elif page == 'stats' %} Account Statistics
-                    {% elif page == 'kvk_history' %} KvK Battle Record
-                    {% elif page == 'credits' %} Wallet & Credits
-                    {% elif page == 'history' %} Season History
-                    {% endif %}
-                </h2>
-                <p class="text-gray-400 text-sm">Real-time data from 2340 Smash Sheets.</p>
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card stat-card h-100 p-4">
+                <div class="stat-label"><i class="fas fa-star me-2 text-warning"></i>Points Earned</div>
+                <div class="stat-value">{{ data.overview.points }}</div>
             </div>
-            <div class="bg-indigo-500/10 text-indigo-400 px-4 py-1.5 rounded-full text-xs font-bold border border-indigo-500/20 shadow-glow">
-                LIVE: {{ data.overview.season }}
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card h-100 p-4">
+                <div class="stat-label"><i class="fas fa-crosshairs me-2 text-muted"></i>Requirement</div>
+                <div class="stat-value">{{ data.overview.req }}</div>
             </div>
-        </header>
-
-        {% if page == 'overview' %}
-        <div class="grid grid-cols-4 gap-6 mb-8">
-            <div class="card p-6 rounded-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10"><i data-lucide="target" class="w-12 h-12"></i></div>
-                <p class="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">Requirement</p>
-                <h3 class="text-3xl font-bold text-white stat-val">{{ data.overview.req }}</h3>
-                <p class="text-xs text-indigo-400 mt-2">Target Points</p>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card h-100 p-4">
+                <div class="stat-label"><i class="fas fa-chess-rook me-2 text-success"></i>Forts Joined</div>
+                <div class="stat-value">{{ data.overview.forts }}</div>
             </div>
-            <div class="card p-6 rounded-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10"><i data-lucide="trophy" class="w-12 h-12"></i></div>
-                <p class="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">Total Points</p>
-                <h3 class="text-3xl font-bold text-emerald-400 stat-val">{{ data.overview.points }}</h3>
-                <p class="text-xs text-gray-500 mt-2">Earned this season</p>
-            </div>
-            <div class="card p-6 rounded-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10"><i data-lucide="flag" class="w-12 h-12"></i></div>
-                <p class="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">Forts Joined</p>
-                <h3 class="text-3xl font-bold text-blue-400 stat-val">{{ data.overview.forts }}</h3>
-                <p class="text-xs text-gray-500 mt-2">Rallies</p>
-            </div>
-            <div class="card p-6 rounded-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10"><i data-lucide="activity" class="w-12 h-12"></i></div>
-                <p class="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">Delta</p>
-                <h3 class="text-3xl font-bold {{ 'text-red-400' if '-' in data.overview.delta|string else 'text-green-400' }} stat-val">
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card h-100 p-4">
+                <div class="stat-label"><i class="fas fa-chart-line me-2 text-danger"></i>Delta</div>
+                <div class="stat-value" style="color: {% if '-' in data.overview.delta|string %}var(--danger){% else %}var(--success){% endif %} !important;">
                     {{ data.overview.delta }}
-                </h3>
-                <p class="text-xs text-gray-500 mt-2">Performance</p>
-            </div>
-        </div>
-        {% endif %}
-
-        {% if page == 'stats' %}
-        <div class="card rounded-2xl overflow-hidden border border-gray-800">
-            <div class="p-5 border-b border-gray-800 bg-gray-900/50">
-                <h3 class="font-bold text-white flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-400"></i> Linked Accounts</h3>
-            </div>
-            <table class="w-full text-sm text-left text-gray-400">
-                <thead class="text-xs uppercase bg-gray-900 text-gray-500">
-                    <tr>
-                        <th class="px-6 py-4">Name</th>
-                        <th class="px-6 py-4">Type</th>
-                        <th class="px-6 py-4 text-right">Power</th>
-                        <th class="px-6 py-4 text-right">Kill Points</th>
-                        <th class="px-6 py-4 text-right">Deads</th>
-                        <th class="px-6 py-4 text-right">T5 Kills</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-800">
-                    {% for acc in data.profile %}
-                    <tr class="table-row hover:bg-indigo-500/5">
-                        <td class="px-6 py-4 font-bold text-white">{{ acc.name }}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 rounded text-xs font-bold {{ 'bg-indigo-500/20 text-indigo-300' if acc.type.lower() == 'main' else 'bg-gray-700/30 text-gray-400' }}">
-                                {{ acc.type }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-right stat-val text-yellow-400">{{ acc.power }}</td>
-                        <td class="px-6 py-4 text-right stat-val">{{ acc.kp }}</td>
-                        <td class="px-6 py-4 text-right stat-val text-red-400">{{ acc.deads }}</td>
-                        <td class="px-6 py-4 text-right stat-val">{{ acc.t5 }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="6" class="px-6 py-8 text-center">No linked accounts found in Rolled UP sheet.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-
-        {% if page == 'kvk_history' %}
-        <div class="card rounded-2xl overflow-hidden border border-gray-800">
-            <div class="p-5 border-b border-gray-800 bg-gray-900/50">
-                 <h3 class="font-bold text-white flex items-center gap-2"><i data-lucide="swords" class="w-4 h-4 text-red-400"></i> KvK Performance Log</h3>
-            </div>
-            <table class="w-full text-sm text-left text-gray-400">
-                <thead class="text-xs uppercase bg-gray-900 text-gray-500">
-                    <tr>
-                        <th class="px-6 py-4">KvK</th>
-                        <th class="px-6 py-4 text-center">Rank</th>
-                        <th class="px-6 py-4 text-right">Total Points</th>
-                        <th class="px-6 py-4 text-right">Kills</th>
-                        <th class="px-6 py-4 text-right">Deads</th>
-                        <th class="px-6 py-4 text-right">T4 Kills</th>
-                        <th class="px-6 py-4 text-right">T5 Kills</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-800">
-                    {% for row in data.kvk_history %}
-                    <tr class="table-row">
-                        <td class="px-6 py-4 font-bold text-white">{{ row.name }}</td>
-                        <td class="px-6 py-4 text-center font-bold text-indigo-400">#{{ row.rank }}</td>
-                        <td class="px-6 py-4 text-right stat-val text-yellow-400">{{ row.points }}</td>
-                        <td class="px-6 py-4 text-right stat-val">{{ row.kills }}</td>
-                        <td class="px-6 py-4 text-right stat-val text-red-400">{{ row.deaths }}</td>
-                        <td class="px-6 py-4 text-right stat-val">{{ row.t4 }}</td>
-                        <td class="px-6 py-4 text-right stat-val text-emerald-400">{{ row.t5 }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="7" class="px-6 py-8 text-center text-gray-600">
-                        {% if not data.kvk_history and not data.error %}
-                            No KvK history found (or ID missing in script).
-                        {% else %}
-                            Waiting for data connection...
-                        {% endif %}
-                    </td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-
-        {% if page == 'credits' %}
-        <div class="max-w-xl mx-auto mt-10">
-            <div class="card p-8 rounded-3xl text-center border-t-4 border-indigo-500 shadow-2xl shadow-indigo-900/20">
-                <div class="w-20 h-20 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-400">
-                    <i data-lucide="wallet" class="w-10 h-10"></i>
                 </div>
-                <h2 class="text-gray-400 text-sm uppercase tracking-widest font-bold mb-2">Available Balance</h2>
-                <h1 class="text-6xl font-black text-white stat-val mb-6">{{ data.credits.redeemable }}</h1>
-                <p class="text-gray-500 text-sm px-10">
-                    Use <span class="text-indigo-400 font-mono bg-gray-800 px-2 py-0.5 rounded">!shop</span> in Discord to redeem items.
-                </p>
             </div>
         </div>
-        {% endif %}
-
-        {% if page == 'history' %}
-        <div class="card rounded-2xl overflow-hidden border border-gray-800">
-            <div class="p-5 border-b border-gray-800 bg-gray-900/50">
-                 <h3 class="font-bold text-white flex items-center gap-2"><i data-lucide="history" class="w-4 h-4 text-gray-400"></i> Season Performance</h3>
-            </div>
-            <table class="w-full text-sm text-left text-gray-400">
-                <thead class="text-xs uppercase bg-gray-900 text-gray-500">
-                    <tr>
-                        <th class="px-6 py-4">Season</th>
-                        <th class="px-6 py-4 text-right">Requirement</th>
-                        <th class="px-6 py-4 text-right">Points Earned</th>
-                        <th class="px-6 py-4 text-right">Forts</th>
-                        <th class="px-6 py-4 text-right">Delta</th>
-                        <th class="px-6 py-4 text-right">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-800">
-                    {% for row in data.history %}
-                    <tr class="table-row">
-                        <td class="px-6 py-4 font-bold text-white">{{ row.season }}</td>
-                        <td class="px-6 py-4 text-right stat-val">{{ row.req }}</td>
-                        <td class="px-6 py-4 text-right stat-val text-emerald-400">{{ row.points }}</td>
-                        <td class="px-6 py-4 text-right stat-val">{{ row.forts }}</td>
-                        <td class="px-6 py-4 text-right stat-val">{{ row.delta }}</td>
-                        <td class="px-6 py-4 text-right">{{ row.status }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="6" class="px-6 py-8 text-center">No history found.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-
     </div>
 
-    <script>
-        lucide.createIcons();
-    </script>
+    {% elif page == 'stats' %}
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-users me-2" style="color: var(--accent-color);"></i>Linked Accounts
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Power</th>
+                        <th>Deads</th>
+                        <th>Kill Points</th>
+                        <th>T5 Kills</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data.profile %}
+                    <tr>
+                        <td class="fw-bold text-white">{{ row.name }}</td>
+                        <td>
+                            {% if row.type|lower == 'main' %}
+                            <span class="badge" style="background-color: var(--accent-color);">MAIN</span>
+                            {% else %}
+                            <span class="badge bg-secondary">FARM</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ row.power }}</td>
+                        <td>{{ row.deads }}</td>
+                        <td class="text-warning">{{ row.kp }}</td>
+                        <td>{{ row.t5 }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No accounts linked.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% elif page == 'credits' %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-5">
+            <div class="card text-center overflow-hidden">
+                <div class="card-body p-5" style="background: radial-gradient(circle at top, #2f3037 0%, var(--bg-card) 70%);">
+                    <div class="mb-3">
+                        <i class="fas fa-wallet fa-3x" style="color: var(--accent-color);"></i>
+                    </div>
+                    <h6 class="text-muted text-uppercase letter-spacing-2">Available Balance</h6>
+                    <h1 class="display-3 fw-bold my-3 text-white">{{ data.credits.redeemable }}</h1>
+                    <div class="p-3 mt-4 rounded" style="background: rgba(88, 101, 242, 0.1); border: 1px solid rgba(88, 101, 242, 0.3);">
+                        <small class="text-muted">To spend, use command:</small><br>
+                        <code style="color: #fff;">!order &lt;item&gt; &lt;amount&gt;</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif page == 'history' %}
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-history me-2" style="color: var(--accent-color);"></i>Season History
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Season</th>
+                        <th>Points</th>
+                        <th>Forts</th>
+                        <th>Requirement</th>
+                        <th>Delta</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data.history %}
+                    <tr>
+                        <td class="fw-bold text-white">{{ row.season }}</td>
+                        <td>{{ row.points }}</td>
+                        <td>{{ row.forts }}</td>
+                        <td>{{ row.req }}</td>
+                        <td class="{% if '-' in row.delta|string %}text-danger{% else %}text-success{% endif %}">{{ row.delta }}</td>
+                        <td>
+                            {% if 'Met' in row.status %}
+                            <span class="badge" style="background-color: rgba(46, 204, 113, 0.2); color: #2ecc71;">PASS</span>
+                            {% else %}
+                            <span class="badge" style="background-color: rgba(231, 76, 60, 0.2); color: #e74c3c;">FAIL</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No history data found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% elif page == 'kvk_history' %}
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-globe me-2" style="color: var(--accent-color);"></i>KvK Performance
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>KvK</th>
+                        <th>Rank</th>
+                        <th>Points</th>
+                        <th>Kills</th>
+                        <th>Deads</th>
+                        <th>T4</th>
+                        <th>T5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data.kvk_history %}
+                    <tr>
+                        <td class="fw-bold" style="color: var(--accent-color);">{{ row.name }}</td>
+                        <td>{{ row.rank }}</td>
+                        <td>{{ row.points }}</td>
+                        <td>{{ row.kills }}</td>
+                        <td class="text-danger">{{ row.deaths }}</td>
+                        <td>{{ row.t4 }}</td>
+                        <td>{{ row.t5 }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No KvK records found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% elif page == 'kingdom' %}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-crown me-2 text-warning"></i>Kingdom Stats (Latest)</span>
+            <span class="badge bg-secondary" style="font-size: 0.75rem;">LIVE DATA</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Governor Name</th>
+                        <th>Power</th>
+                        <th>Tag</th>
+                        <th>Deads</th>
+                        <th>Kill Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td class="text-muted" style="font-family: monospace;">{{ row.id }}</td>
+                        <td class="fw-bold text-white">{{ row.name }}</td>
+                        <td>{{ row.power }}</td>
+                        <td><span class="badge" style="background-color: #3f3f46;">{{ row.tag }}</span></td>
+                        <td class="text-danger">{{ row.deads }}</td>
+                        <td class="text-warning fw-bold">{{ row.kp }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No kingdom data loaded.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
